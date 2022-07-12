@@ -160,16 +160,18 @@ io_change(
 ## 4. CLI Execution
 ```bash
 $ sio4onnx \
---input_onnx_file_path crestereo_init_iter2_120x160.onnx \
---output_onnx_file_path crestereo_init_iter2_120x160_upd.onnx \
---input_names "input.A" \
---input_names "input.B" \
---input_shapes 1 3 "H" "W" \
---input_shapes "N" 3 "H" "W" \
---output_names "output.a" \
---output_names "output.b" \
---output_shapes 1 3 "H" "W" \
---output_shapes "N", 3, "H", "W"
+--input_onnx_file_path yolov3-10.onnx \
+--output_onnx_file_path yolov3-10_upd.onnx \
+--input_names "input_1" \
+--input_names "image_shape" \
+--input_shapes "batch" 3 "H" "W" \
+--input_shapes "batch" 2 \
+--output_names "yolonms_layer_1/ExpandDims_1:0" \
+--output_names "yolonms_layer_1/ExpandDims_3:0" \
+--output_names "yolonms_layer_1/concat_2:0" \
+--output_shapes 1 "boxes" 4 \
+--output_shapes 1 "classes" "boxes" \
+--output_shapes "boxes" 3
 ```
 
 ## 5. In-script Execution
@@ -177,11 +179,30 @@ $ sio4onnx \
 from sio4onnx import shape_inference
 
 estimated_graph = io_change(
-    input_onnx_file_path="crestereo_init_iter2_120x160.onnx",
-    output_onnx_file_path='crestereo_init_iter2_120x160_upd.onnx',
-    input_names=["input.A", "input.B"],
-    input_shapes=[[1, 3, "H", "W"], ["N", 3, "H", "W"]],
-    output_names=["output.a", "output.b"],
-    output_shapes=[[1, 3, "H", "W"], ["N", 3, "H", "W"]],
+    input_onnx_file_path="yolov3-10.onnx",
+    output_onnx_file_path="yolov3-10_upd.onnx",
+    input_names=[
+        "input_1",
+        "image_shape",
+    ],
+    input_shapes=[
+        ["batch", 3, "H", "W"],
+        ["batch", 2],
+    ],
+    output_names=[
+        "yolonms_layer_1/ExpandDims_1:0",
+        "yolonms_layer_1/ExpandDims_3:0",
+        "yolonms_layer_1/concat_2:0",
+    ],
+    output_shapes=[
+        [1, "boxes", 4],
+        [1, "classes", "boxes"],
+        ["boxes", 3],
+    ],
 )
 ```
+## 6. Sample
+### Before
+![image](https://user-images.githubusercontent.com/33194443/178515405-42d2bd01-f5fa-41be-95e3-3a229b0c8ae9.png)
+### After
+![image](https://user-images.githubusercontent.com/33194443/178515314-ecbf7f85-5c1d-4626-ac8b-3558432f6e9b.png)
