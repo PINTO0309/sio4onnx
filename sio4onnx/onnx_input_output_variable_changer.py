@@ -3,8 +3,9 @@
 import sys
 import onnx
 from onnx.tools import update_model_dims
-from typing import Optional, List
+from typing import Optional, List, Union
 from argparse import ArgumentParser
+from ast import literal_eval
 
 class Color:
     BLACK          = '\033[30m'
@@ -37,9 +38,9 @@ def io_change(
     onnx_graph: Optional[onnx.ModelProto] = None,
     output_onnx_file_path: Optional[str] = '',
     input_names: Optional[List[str]] = [],
-    input_shapes: Optional[List[str]] = [],
+    input_shapes: Optional[List[Union[int, str]]] = [],
     output_names: Optional[List[str]] = [],
-    output_shapes: Optional[List[str]] = [],
+    output_shapes: Optional[List[Union[int, str]]] = [],
     non_verbose: Optional[bool] = False,
 ) -> onnx.ModelProto:
     """
@@ -65,7 +66,7 @@ def io_change(
         The order is unspecified, but must match the order specified for input_shapes.\n\
         e.g. ['input.A', 'input.B', 'input.C']
 
-    input_shapes: Optional[List[str]]
+    input_shapes: Optional[List[Union[int, str]]]
         List of input OP shapes. All input OPs of the model must be specified.\n\
         The order is unspecified, but must match the order specified for input_names.\n\
         e.g.\n\
@@ -80,7 +81,7 @@ def io_change(
         The order is unspecified, but must match the order specified for output_shapes.\n\
         e.g. ['output.a', 'output.b', 'output.c']
 
-    output_shapes: Optional[List[str]]
+    output_shapes: Optional[List[Union[int, str]]]
         List of input OP shapes. All output OPs of the model must be specified.\n\
         The order is unspecified, but must match the order specified for output_shapes.\n\
         e.g.\n\
@@ -273,10 +274,36 @@ def main():
     input_onnx_file_path = args.input_onnx_file_path
     output_onnx_file_path = args.output_onnx_file_path
     input_names = args.input_names
-    input_shapes = args.input_shapes
     output_names = args.output_names
-    output_shapes = args.output_shapes
     non_verbose = args.non_verbose
+
+    input_shapes = []
+    for src in args.input_shapes:
+        input_shape = []
+        for s in src:
+            try:
+                val = literal_eval(s)
+                if isinstance(val, int) and val >= 0:
+                    input_shape.append(val)
+                else:
+                    input_shape.append(s)
+            except:
+                input_shape.append(s)
+        input_shapes.append(input_shape)
+
+    output_shapes = []
+    for src in args.output_shapes:
+        output_shape = []
+        for s in src:
+            try:
+                val = literal_eval(s)
+                if isinstance(val, int) and val >= 0:
+                    output_shape.append(val)
+                else:
+                    output_shape.append(s)
+            except:
+                output_shape.append(s)
+        output_shapes.append(output_shape)
 
     input_name_list = [name for name in input_names]
     input_shape_list = [name for name in input_shapes]
