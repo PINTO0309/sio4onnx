@@ -95,9 +95,9 @@ io_change(
     onnx_graph: Union[onnx.onnx_ml_pb2.ModelProto, NoneType] = None,
     output_onnx_file_path: Union[str, NoneType] = '',
     input_names: Union[List[str], NoneType] = [],
-    input_shapes: Union[List[str], NoneType] = [],
+    input_shapes: Union[List[Union[int, str]], NoneType] = [],
     output_names: Union[List[str], NoneType] = [],
-    output_shapes: Union[List[str], NoneType] = [],
+    output_shapes: Union[List[Union[int, str]], NoneType] = [],
     non_verbose: Union[bool, NoneType] = False,
 ) -> onnx.onnx_ml_pb2.ModelProto
 
@@ -122,7 +122,7 @@ io_change(
         The order is unspecified, but must match the order specified for input_shapes.
         e.g. ['input.A', 'input.B', 'input.C']
 
-    input_shapes: Optional[List[str]]
+    input_shapes: Optional[List[Union[int, str]]]
         List of input OP shapes. All input OPs of the model must be specified.
         The order is unspecified, but must match the order specified for input_names.
         e.g.
@@ -137,7 +137,7 @@ io_change(
         The order is unspecified, but must match the order specified for output_shapes.
         e.g. ['output.a', 'output.b', 'output.c']
 
-    output_shapes: Optional[List[str]]
+    output_shapes: Optional[List[Union[int, str]]]
         List of input OP shapes. All output OPs of the model must be specified.
         The order is unspecified, but must match the order specified for output_shapes.
         e.g.
