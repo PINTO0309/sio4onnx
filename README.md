@@ -178,7 +178,7 @@ $ sio4onnx \
 ```python
 from sio4onnx import io_change
 
-estimated_graph = io_change(
+io_changed_graph = io_change(
     input_onnx_file_path="yolov3-10.onnx",
     output_onnx_file_path="yolov3-10_upd.onnx",
     input_names=[
